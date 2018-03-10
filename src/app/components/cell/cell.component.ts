@@ -9,6 +9,7 @@ import {Cell} from '../../models/cell'
 export class CellComponent implements OnInit {
 
   @Input() data:Cell
+  @Input() setCurrent:any // callback function 
 
   constructor() { 
     this.data = new Cell()
@@ -26,6 +27,10 @@ export class CellComponent implements OnInit {
       this.data.isFlagged = false
       this.data.cellgliph = ""
     }
+  }
+  //reveal cell in board
+  revealCell(){
+    this.setCurrent(this.data)
   }
 
 }
