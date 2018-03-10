@@ -1,5 +1,8 @@
 <button class="btn btn-default" 
         (click)="revealCell()"
-        (contextmenu)="setFlagInCell($event)">
+        (contextmenu)="setFlagInCell($event)"
+        [disabled]="data.isRevealed"
+        [ngClass]="data.cellStyle">
   <i class="{{data.cellgliph}}"></i> 
+  {{data.countAround? data.countAround : ""}}
 </button>

@@ -6,6 +6,7 @@ export class Cell {
     public countAround: number
     public isRevealed: boolean
     public cellgliph: string
+    public cellStyle: string
 
     constructor(){
                     this.row = -1
@@ -15,5 +16,6 @@ export class Cell {
                     this.countAround =  0
                     this.isRevealed =  false
                     this.cellgliph = ''
+                    this.cellStyle = ''
                 }
 }

@@ -28,20 +28,25 @@ export class BoardComponent implements OnInit {
       isFlagged:false,
       countAround:0,
       isRevealed:false,
-      cellgliph: ''
+      cellgliph: '',
+      cellStyle: ''
     }
 
     //Bind conditiontions to this component     
     this.setCurrent.bind(this)
     this.revealCell.bind(this)   
     this.checkAdyacents.bind(this) 
+    this.gameOver.bind(this)
   }
 
   ngOnInit() {
     this.paintBoard(BEGINNER)
   }
   
-  //set board according to the level
+  /**
+   * Paint board according to game level
+   * @param {number} level 
+   */
   private paintBoard(level: number){
     this.board = []
     for (let x = 0; x < level; x++) {
@@ -60,6 +65,15 @@ export class BoardComponent implements OnInit {
       }
     }
     this.plantMines()    
+  }
+  
+  /**
+   * Repaint Board when level change
+   * @param event Event triggered
+   */
+  rePrintBoard(event){
+    this._level = event.target.value
+    this.paintBoard(this._level)
   }
 
   /**
@@ -82,8 +96,7 @@ export class BoardComponent implements OnInit {
       if(recursive){
         return
       }
-      cell.cellgliph = 'glyphicon glyphicon-asterisk'
-      console.log("game Over")
+      this.gameOver()
       return
     }  
     if(cell.isFlagged || (recursive && cell.isRevealed)){
@@ -91,6 +104,7 @@ export class BoardComponent implements OnInit {
     }  
     
     cell.isRevealed = true
+    cell.cellStyle = 'revealed'
     cell.countAround = (this.checkAdyacents(cell, (cell)=>cell.isBomb == true)).length
     if(!cell.countAround){
       let neighbors = this.checkAdyacents(cell, (cell)=>cell.isBomb == false)
@@ -154,6 +168,22 @@ export class BoardComponent implements OnInit {
         planted++
       }
     }    
+  }
+
+  /**
+   * Game over 
+   */
+  private gameOver = ()=>{
+    this.board.forEach((arrays)=>{
+      arrays.forEach((cell)=>{
+        cell.isRevealed = true
+        cell.cellStyle = 'revealed'
+        if(cell.isBomb){
+          cell.cellgliph = 'glyphicon glyphicon-asterisk'
+          cell.cellStyle = 'boom'
+        }
+      })
+    })
   }
 
 }

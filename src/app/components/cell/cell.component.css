@@ -2,7 +2,15 @@
     width: 40px !important;
     height: 40px !important;
     margin: 0;
+    background: #e5e3e3;
+    font-weight: bolder;
+    font-size: 16px;
 }
-.revealed{
-    background: yellowgreen;
+
+.revealed, .revealed:hover{
+    background: #fff;
+}
+
+.boom, .boom:hover{
+    background: #f20726;
 }
