@@ -5,20 +5,15 @@ export class Cell {
     public isFlagged: boolean
     public countAround: number
     public isRevealed: boolean
-    public cellgliph: string = ''
+    public cellgliph: string
 
-    constructor(cell: {row:number, 
-                col:number,
-                isBomb:boolean,
-                isFlagged:boolean,
-                countAround:number,
-                isRevealed:boolean,
-                cellgliph:string}){
-                    this.row = cell.row || 0
-                    this.col = cell.col || 0
-                    this.isBomb = cell.isBomb || false
-                    this.isFlagged = cell.isFlagged || false
-                    this.countAround = cell.countAround || 0
-                    this.isRevealed = cell.isRevealed || false
+    constructor(){
+                    this.row = -1
+                    this.col =  -1
+                    this.isBomb =  false
+                    this.isFlagged =  false
+                    this.countAround =  0
+                    this.isRevealed =  false
+                    this.cellgliph = ''
                 }
 }

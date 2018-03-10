@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import {Cell} from '../../models/cell'
 
 @Component({
   selector: 'app-cell',
@@ -7,9 +8,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CellComponent implements OnInit {
 
-  constructor() { }
+  @Input() data:Cell
+
+  constructor() { 
+    this.data = new Cell()
+  }
 
   ngOnInit() {
+  }
+  setFlagInCell($event){
+    $event.preventDefault()
+    if(!this.data.isFlagged){
+      this.data.isFlagged = true
+      this.data.cellgliph = "glyphicon glyphicon-flag"
+    }
+    else{
+      this.data.isFlagged = false
+      this.data.cellgliph = ""
+    }
   }
 
 }
