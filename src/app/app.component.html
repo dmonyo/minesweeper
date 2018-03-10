@@ -53,5 +53,6 @@
 </nav>
 
 <div class="container">
-  <app-board></app-board>
+  <game-modal [modal]="modal" (onClose)="closeMessage()"></game-modal>
+  <app-board (finalMessage)="showMessage($event)" #board></app-board>
 </div>

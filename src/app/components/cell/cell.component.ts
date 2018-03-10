@@ -17,6 +17,10 @@ export class CellComponent implements OnInit {
 
   ngOnInit() {
   }
+  /**
+   * Toggle Flag icon in selected cell when right click
+   * @param $event Right click event
+   */
   setFlagInCell($event){
     $event.preventDefault()
     if(!this.data.isFlagged){
@@ -28,7 +32,10 @@ export class CellComponent implements OnInit {
       this.data.cellgliph = ""
     }
   }
-  //reveal cell in board
+
+  /**
+   * Reveal cell in board
+   */
   revealCell(){
     this.setCurrent(this.data)
   }

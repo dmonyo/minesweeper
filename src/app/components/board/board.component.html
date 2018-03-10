@@ -3,17 +3,13 @@
     <form>
       <div class="form-group">
         <label for="game-level"></label>
-        <select class="form-control" id="game-level" (ngModel)="level"(change)="rePrintBoard($event)" >         
+        <select class="form-control" id="game-level" (ngModel)="level"(change)="rePrintBoard($event.target.value)" >         
           <option value="9">Beginner</option>
           <option value="16">Expert</option>
         </select>
       </div>
     </form>
-    <div class="form-group">
-      <label for="" class="form-control">Current Cell clicked:</label>
-      <p>Row: {{_current.row}}</p>
-      <p>Col: {{_current.col}}</p>
-    </div>
+    
   </div>
   <div class="col-sm-9">
     <div class="row" *ngFor="let rows of board">          

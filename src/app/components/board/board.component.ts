@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {Cell} from '../../models/cell'
+import {Modal} from '../../models/modal'
 
 //Game level constant definitions
 const BEGINNER:number = 9 
@@ -16,11 +17,16 @@ export class BoardComponent implements OnInit {
   private _level:number
   private _current: Cell
   private _adyacents:number[] = [-1, 0, 1]
-
+  private _totalCellsNotRevealed: number
+  private _totalBombs: number
+  @Input() modal:Modal
+  @Output() finalMessage:EventEmitter<string> =  new EventEmitter<string>()
   constructor() { 
     //Initialize properties
     this.board = [[]]
     this._level = BEGINNER
+    this._totalCellsNotRevealed = 0
+    this._totalBombs = 0
     this._current = {
       row:-1,
       col:1,
@@ -37,6 +43,7 @@ export class BoardComponent implements OnInit {
     this.revealCell.bind(this)   
     this.checkAdyacents.bind(this) 
     this.gameOver.bind(this)
+    this.rePrintBoard.bind(this)
   }
 
   ngOnInit() {
@@ -64,6 +71,7 @@ export class BoardComponent implements OnInit {
         this.board[x].push(cell)
       }
     }
+    this.setTotalOfCells(level)
     this.plantMines()    
   }
   
@@ -71,8 +79,8 @@ export class BoardComponent implements OnInit {
    * Repaint Board when level change
    * @param event Event triggered
    */
-  rePrintBoard(event){
-    this._level = event.target.value
+  rePrintBoard = (value)=>{
+    this._level = value
     this.paintBoard(this._level)
   }
 
@@ -84,6 +92,14 @@ export class BoardComponent implements OnInit {
     this._current = currentCell
     this.revealCell(this._current, false)
   }
+  
+  /**
+   * Set totals of cells in 
+   * @param level 
+   */
+  setTotalOfCells(level:number){
+    this._totalCellsNotRevealed = level * level
+  }
 
   /**
    * Reveal cell in board and the adyacents if necessary
@@ -91,7 +107,7 @@ export class BoardComponent implements OnInit {
    * @param {Boolean} recursive Cell revelation mode
    */
   private revealCell = (cell:Cell, recursive = false)=>{
-    let scope = this
+    let scope = this    
     if(cell.isBomb){
       if(recursive){
         return
@@ -105,6 +121,7 @@ export class BoardComponent implements OnInit {
     
     cell.isRevealed = true
     cell.cellStyle = 'revealed'
+    scope._totalCellsNotRevealed --
     cell.countAround = (this.checkAdyacents(cell, (cell)=>cell.isBomb == true)).length
     if(!cell.countAround){
       let neighbors = this.checkAdyacents(cell, (cell)=>cell.isBomb == false)
@@ -112,6 +129,12 @@ export class BoardComponent implements OnInit {
           scope.revealCell(c,true)    
       })
     }    
+    //Check for win escenario
+    if(scope.endedGame()){
+      this.winGame()
+      return
+    }
+      
   }
 
   /**
@@ -150,16 +173,17 @@ export class BoardComponent implements OnInit {
    * Plant mines randomly all over the board
    */
   private plantMines(){
-    let totalBomb = 0, planted = 0
+    let  planted = 0
+    this._totalBombs = 0
     switch (this._level){
       case (EXPERT):
-        totalBomb = 40
+      this._totalBombs = 40
         break;
       default:
-        totalBomb = 10
+      this._totalBombs = 10
         break
     }
-    while(planted < totalBomb){
+    while(planted < this._totalBombs){
       let x = Math.floor((Math.random() * this._level) )
       let y = Math.floor((Math.random() * this._level))
       let cell = this.board[x][y]
@@ -168,6 +192,17 @@ export class BoardComponent implements OnInit {
         planted++
       }
     }    
+  }
+  
+  /**
+   * Check if the game is finished
+   */
+  private endedGame = ()=>{
+    return this._totalBombs == this._totalCellsNotRevealed
+  }
+
+  private winGame = ()=>{    
+    this.finalMessage.emit('win')
   }
 
   /**
@@ -184,6 +219,7 @@ export class BoardComponent implements OnInit {
         }
       })
     })
-  }
+    this.finalMessage.emit('lose')
+  }  
 
 }
