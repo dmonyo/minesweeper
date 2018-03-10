@@ -31,18 +31,19 @@ export class BoardComponent implements OnInit {
       cellgliph: ''
     }
 
-    //Bind functions to this component     
+    //Bind conditiontions to this component     
     this.setCurrent.bind(this)
-    // this.revealCell.bind(this)   
-    // this.checkAdyacents.bind(this) 
+    this.revealCell.bind(this)   
+    this.checkAdyacents.bind(this) 
   }
 
   ngOnInit() {
     this.paintBoard(BEGINNER)
   }
-
+  
+  //set board according to the level
   private paintBoard(level: number){
-    this.board = [[]]
+    this.board = []
     for (let x = 0; x < level; x++) {
       this.board.push([])
       for (let y = 0; y < level; y++){
@@ -58,13 +59,101 @@ export class BoardComponent implements OnInit {
         this.board[x].push(cell)
       }
     }
-    //this.plantMines()    
+    this.plantMines()    
   }
 
-
+  /**
+   * Set current clicked Cell
+   * @param {Cell} currentCell Clicked cell
+   */
   setCurrent = (currentCell: Cell)=>{
     this._current = currentCell
-    //this.revealCell(this._current, false)
+    this.revealCell(this._current, false)
+  }
+
+  /**
+   * Reveal cell in board and the adyacents if necessary
+   * @param {Cell} cell Clicked cell
+   * @param {Boolean} recursive Cell revelation mode
+   */
+  private revealCell = (cell:Cell, recursive = false)=>{
+    let scope = this
+    if(cell.isBomb){
+      if(recursive){
+        return
+      }
+      cell.cellgliph = 'glyphicon glyphicon-asterisk'
+      console.log("game Over")
+      return
+    }  
+    if(cell.isFlagged || (recursive && cell.isRevealed)){
+      return
+    }  
+    
+    cell.isRevealed = true
+    cell.countAround = (this.checkAdyacents(cell, (cell)=>cell.isBomb == true)).length
+    if(!cell.countAround){
+      let neighbors = this.checkAdyacents(cell, (cell)=>cell.isBomb == false)
+      neighbors.forEach((c)=>{
+          scope.revealCell(c,true)    
+      })
+    }    
+  }
+
+  /**
+   * Check adyacents to Cell for a given condition
+   * @argument {Cell} cell Current cell
+   * @argument {function} condition Condition to check in cells
+   * @returns {Array.<Cell>} Adyacent cells
+   */
+  checkAdyacents = (cell:Cell, condition)=>{
+    let length = this._level;
+    let result:Cell[] = []
+    let board = this.board
+    
+    this._adyacents.forEach((x)=>{
+      //checking range for row
+      let row = cell.row + x
+      if(row < 0 || row >= length){
+        return;
+      }
+      
+      this._adyacents.forEach((y)=>{
+        //checking range for column
+        let col = cell.col + y
+        if(col < 0 || col >=length)
+          return;
+        //Check condition in selected cell
+        if(condition(board[row][col]))
+          result.push(board[row][col])
+      })
+    })
+    
+    return result;
+  }
+  
+  /**
+   * Plant mines randomly all over the board
+   */
+  private plantMines(){
+    let totalBomb = 0, planted = 0
+    switch (this._level){
+      case (EXPERT):
+        totalBomb = 40
+        break;
+      default:
+        totalBomb = 10
+        break
+    }
+    while(planted < totalBomb){
+      let x = Math.floor((Math.random() * this._level) )
+      let y = Math.floor((Math.random() * this._level))
+      let cell = this.board[x][y]
+      if(!cell.isBomb){
+        cell.isBomb = true
+        planted++
+      }
+    }    
   }
 
 }
